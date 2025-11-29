@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foto Hosting - URL Nyata</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #764ba2;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-area:hover {
+            background-color: #eef2ff;
+            border-color: #667eea;
+        }
+        
+        .upload-area i {
+            font-size: 50px;
+            color: #764ba2;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            margin: 10px 0;
+            color: #666;
+        }
+        
+        .upload-area.highlight {
+            background-color: #e6f0ff;
+            border-color: #667eea;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .preview-container {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .preview-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #764ba2;
+        }
+        
+        #image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .image-info {
+            background-color: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .image-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .url-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .url-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #764ba2;
+        }
+        
+        .url-box {
+            background: #f8f9ff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        #url-output {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #764ba2;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: white;
+            margin-bottom: 15px;
+            word-break: break-all;
+            font-family: monospace;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .info-box {
+            background-color: #eef7ff;
+            border-left: 4px solid #764ba2;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        
+        .info-box h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #764ba2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            display: none;
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .vercel-url {
+            color: #764ba2;
+            font-weight: bold;
+            font-family: monospace;
+            background: #f0f8ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Foto Hosting - URL Nyata</h1>
+        <p class="description">Unggah foto Anda dan dapatkan URL hosting yang nyata</p>
+        
+        <div class="success-message" id="success-message">
+            ✅ Foto berhasil diunggah! URL telah disalin ke clipboard.
+        </div>
+        
+        <div class="error-message" id="error-message">
+            ❌ Terjadi kesalahan saat mengunggah foto. Silakan coba lagi.
+        </div>
+        
+        <div class="upload-area" id="upload-area">
+            <i>📷</i>
+            <h3>Klik atau seret foto ke sini</h3>
+            <p>Format yang didukung: JPG, PNG, GIF, WebP (Maks. 10MB)</p>
+            <input type="file" id="file-input" accept="image/*">
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Mengunggah foto ke server...</p>
+        </div>
+        
+        <div class="preview-container" id="preview-container">
+            <h3 class="preview-title">Pratinjau Foto</h3>
+            <img id="image-preview" src="" alt="Pratinjau Foto">
+            
+            <div class="image-info" id="image-info">
+                <p><strong>Nama file:</strong> <span id="file-name">-</span></p>
+                <p><strong>Ukuran:</strong> <span id="file-size">-</span></p>
+                <p><strong>Dimensi:</strong> <span id="file-dimensions">-</span></p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn" id="upload-btn">Unggah ke Server</button>
+                <button class="btn" id="cancel-btn">Batalkan</button>
+            </div>
+        </div>
+        
+        <div class="url-container" id="url-container">
+            <h3 class="url-title">✅ URL Hosting Anda</h3>
+            <div class="url-box">
+                <p>Foto Anda telah berhasil dihosting di:</p>
+                <input type="text" id="url-output" readonly>
+                <button class="btn copy-btn" id="copy-btn">Salin URL</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn" id="test-btn">Buka Foto di Tab Baru</button>
+                <button class="btn" id="new-upload-btn">Unggah Foto Lain</button>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <h3>Informasi Hosting</h3>
+            <ul>
+                <li>Foto disimpan di server dan dapat diakses oleh siapa saja</li>
+                <li>URL dapat dibagikan langsung</li>
+                <li>Mendukung semua format gambar populer</li>
+                <li>File tersimpan secara permanen di server</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2023 Foto Hosting - Implementasi Nyata</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const previewContainer = document.getElementById('preview-container');
+            const imagePreview = document.getElementById('image-preview');
+            const uploadBtn = document.getElementById('upload-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const urlContainer = document.getElementById('url-container');
+            const urlOutput = document.getElementById('url-output');
+            const copyBtn = document.getElementById('copy-btn');
+            const testBtn = document.getElementById('test-btn');
+            const newUploadBtn = document.getElementById('new-upload-btn');
+            const loading = document.getElementById('loading');
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const fileDimensions = document.getElementById('file-dimensions');
+            
+            let currentFile = null;
+
+            // Event listener untuk area unggah
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Event listener untuk drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadArea.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                uploadArea.classList.remove('highlight');
+            }
+            
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+            
+            // Event listener untuk input file
+            fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+            
+            function handleFiles(files) {
+                if (files.length === 0) return;
+                
+                const file = files[0];
+                currentFile = file;
+                
+                // Validasi tipe file
+                if (!file.type.match('image.*')) {
+                    alert('Silakan unggah file gambar (JPG, PNG, GIF, WebP)');
+                    return;
+                }
+                
+                // Validasi ukuran file (maks 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('Ukuran file terlalu besar. Maksimal 10MB.');
+                    return;
+                }
+                
+                // Tampilkan info file
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                
+                // Tampilkan pratinjau
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    
+                    // Dapatkan dimensi gambar
+                    const img = new Image();
+                    img.onload = function() {
+                        fileDimensions.textContent = `${img.width} x ${img.height} piksel`;
+                    };
+                    img.src = e.target.result;
+                    
+                    previewContainer.style.display = 'block';
+                    urlContainer.style.display = 'none';
+                    successMessage.style.display = 'none';
+                    errorMessage.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Event listener untuk tombol unggah
+            uploadBtn.addEventListener('click', async function() {
+                if (!currentFile) return;
+                
+                loading.style.display = 'block';
+                previewContainer.style.display = 'none';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                
+                try {
+                    // Upload file ke server
+                    const formData = new FormData();
+                    formData.append('image', currentFile);
+                    
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Tampilkan URL
+                        urlOutput.value = result.url;
+                        urlContainer.style.display = 'block';
+                        
+                        // Salin URL ke clipboard secara otomatis
+                        urlOutput.select();
+                        document.execCommand('copy');
+                        
+                        // Tampilkan pesan sukses
+                        successMessage.style.display = 'block';
+                    } else {
+                        throw new Error(result.error || 'Gagal mengunggah gambar');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    errorMessage.textContent = `❌ Error: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            });
+            
+            // Event listener untuk tombol batalkan
+            cancelBtn.addEventListener('click', function() {
+                previewContainer.style.display = 'none';
+                urlContainer.style.display = 'none';
+                fileInput.value = '';
+                currentFile = null;
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+            });
+            
+            // Event listener untuk tombol salin
+            copyBtn.addEventListener('click', function() {
+                urlOutput.select();
+                document.execCommand('copy');
+                
+                // Ubah teks tombol sementara
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ URL Disalin!';
+                copyBtn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+                
+                setTimeout(function() {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            });
+            
+            // Event listener untuk tombol buka foto
+            testBtn.addEventListener('click', function() {
+                const url = urlOutput.value;
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+            
+            // Event listener untuk tombol unggah lagi
+            newUploadBtn.addEventListener('click', function() {
+                urlContainer.style.display = 'none';
+                fileInput.value = '';
+                currentFile = null;
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+            });
+            
+            // Fungsi untuk memformat ukuran file
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
+</body>
+</html>
