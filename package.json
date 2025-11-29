@@ -1,7 +1,7 @@
 {
-  "name": "photo-hosting",
+  "name": "photo-hosting-real",
   "version": "1.0.0",
-  "description": "Real photo hosting service",
+  "description": "Real photo hosting service with multiple storage options",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +11,9 @@
     "next": "^13.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "@vercel/blob": "^0.5.0"
+    "@vercel/blob": "^0.5.0",
+    "cloudinary": "^1.40.0",
+    "aws-sdk": "^2.1467.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
